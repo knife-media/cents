@@ -1,0 +1,16 @@
+{
+  "name": "kopecks",
+  "author": {
+    "name": "Anton Lukin",
+    "url": "https://lukin.me"
+  },
+  "license": "MIT",
+  "version": "1.0.0",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "escape-html": "^1.0.3",
+    "restify": "^8.5.1",
+    "sqlite3": "^4.1.1",
+    "telegraf": "^3.37.0"
+  }
+}
