@@ -32,8 +32,8 @@ exports.up = function(db, callback) {
       type: 'text'
     },
     created: {
-      type: 'text',
-      defaultValue: new String('CURRENT_TIMESTAMP')
+      type: 'timestamp',
+      defaultValue: new String('now()')
     }
   }, callback);
 };

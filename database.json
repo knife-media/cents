@@ -1,8 +1,9 @@
 {
     "defaultEnv": "local",
     "local": {
-      "driver": "sqlite3",
-      "filename": "kopecks.db",
+      "driver": "mysql",
+      "user": "root",
+      "password": "root",
       "database": "kopecks"
     }
 }

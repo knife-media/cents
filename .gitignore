@@ -1,2 +1,2 @@
 .env
-kopecks.db
+docker-compose.yaml
