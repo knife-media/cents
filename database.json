@@ -1,0 +1,9 @@
+{
+    "defaultEnv": "local",
+    "local": {
+      "driver": "mysql",
+      "user": {"ENV": "DB_USER"},
+      "password": {"ENV": "DB_PASSWORD"},
+      "database": {"ENV": "DB_NAME"}
+    }
+}

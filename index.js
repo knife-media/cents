@@ -11,8 +11,6 @@ const Telegraf = require('telegraf');
 const mysql = require('mysql2');
 const escape = require('escape-html');
 
-const storage = require('./database.json');
-
 // Parse dotenv config
 require('dotenv').config();
 
@@ -21,9 +19,9 @@ const bot = new Telegraf(process.env.TOKEN);
 
 // Create database instance
 const database = mysql.createConnection({
-  user: storage.local.user,
-  password: storage.local.password,
-  database: storage.local.database
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME
 });
 
 // Parse post from message
