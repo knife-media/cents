@@ -1,5 +1,5 @@
 /**
- * Kopecks bot
+ * Knife cents bot
  *
  * Parse and store messages sent to Telegram bot
  *
@@ -7,9 +7,9 @@
  * @license MIT
  */
 
-const Telegraf = require('telegraf');
 const mysql = require('mysql2');
 const escape = require('escape-html');
+const Telegraf = require('telegraf');
 
 // Parse dotenv config
 require('dotenv').config();
@@ -19,6 +19,7 @@ const bot = new Telegraf(process.env.TOKEN);
 
 // Create database instance
 const database = mysql.createConnection({
+  host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME
@@ -69,13 +70,11 @@ const createPost = (msg) => {
 
 // Process channel post
 bot.on('channel_post', (ctx, next) => {
-  let sql = `INSERT INTO messages SET ?`;
-
-  if (ctx.chat.id == process.env.GROUP_ID) {
+  if (ctx.chat && ctx.chat.id == process.env.GROUP_ID) {
     // Escape all tags first
     let post = createPost(ctx.channelPost);
 
-    database.query(sql, post, (err) => {
+    database.query(`INSERT INTO messages SET ?`, post, (err) => {
       if (err) {
         return console.error(err.message);
       }
@@ -87,7 +86,7 @@ bot.on('channel_post', (ctx, next) => {
 bot.on('edited_channel_post', (ctx, next) => {
   let sql = `UPDATE messages SET title = ?, content = ?, source = ?, link = ? WHERE message = ?`;
 
-  if (ctx.chat.id == process.env.GROUP_ID) {
+  if (ctx.chat && ctx.chat.id == process.env.GROUP_ID) {
     // Escape all tags first
     let post = createPost(ctx.editedChannelPost);
 
@@ -101,21 +100,25 @@ bot.on('edited_channel_post', (ctx, next) => {
 
 // Delete message on forward
 bot.on('forward', (ctx) => {
-  let sql = `DELETE FROM messages WHERE message = ?`;
+  let msg = ctx.message;
 
-  if (ctx.message.forward_from_chat.id == process.env.GROUP_ID) {
-    let msg = ctx.message;
-
-    database.query(sql, [msg.forward_from_message_id], (err) => {
+  // Check if message forwarded from chat
+  if (msg.forward_from_chat && msg.forward_from_chat.id == process.env.GROUP_ID) {
+    database.query(`DELETE FROM messages WHERE message = ?`, [msg.forward_from_message_id], (err) => {
       if (err) {
-        return console.error(err.message);
+        console.error(err.message);
       }
 
-      // Delete message from channel
-      ctx.telegram.deleteMessage(msg.forward_from_chat.id, msg.forward_from_message_id);
+      try {
+        // Delete message from channel
+        ctx.telegram.deleteMessage(msg.forward_from_chat.id, msg.forward_from_message_id);
 
-      // Delete current message
-      ctx.deleteMessage();
+        // Delete current message
+        ctx.deleteMessage();
+
+      } catch (error) {
+        console.error(error)
+      }
     });
   }
 });
