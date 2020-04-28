@@ -1,6 +1,6 @@
-# kopecks-bot
+# cents-bot
 
-Simple syncing Telegram channel with website page
+Simple synchronization Telegram channel with website page
 
 ## Installation
 
