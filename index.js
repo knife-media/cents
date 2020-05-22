@@ -68,9 +68,33 @@ const createPost = (msg) => {
   return post;
 }
 
+// Show start message
+bot.start((ctx, next) => {
+  ctx.reply(`Отправьте свою историю со ссылкой на источник. Максимальная длина текста — 1000 знаков.`)
+});
+
+// Process post to bot
+bot.on('text', (ctx, next) => {
+  let text = [];
+
+  // Set message text
+  text.push(`<b>Добавлена новая заявка</b>\n${ctx.message.text}`);
+
+  // Get sender username
+  let from = ctx.message.from.username || ctx.message.from.id;
+
+  // Update message with sender
+  text.push(`<b>Автор</b>\n@${from}`)
+
+  // Send to moderate group
+  ctx.telegram.sendMessage(process.env.GROUP_MODERATE, text.join("\n\n"), {
+    'parse_mode': 'HTML'
+  });
+});
+
 // Process channel post
 bot.on('channel_post', (ctx, next) => {
-  if (ctx.chat && ctx.chat.id == process.env.GROUP_ID) {
+  if (ctx.chat && ctx.chat.id == process.env.CHANNEL_ID) {
     // Escape all tags first
     let post = createPost(ctx.channelPost);
 
@@ -86,7 +110,7 @@ bot.on('channel_post', (ctx, next) => {
 bot.on('edited_channel_post', (ctx, next) => {
   let sql = `UPDATE messages SET title = ?, content = ?, source = ?, link = ? WHERE message = ?`;
 
-  if (ctx.chat && ctx.chat.id == process.env.GROUP_ID) {
+  if (ctx.chat && ctx.chat.id == process.env.CHANNEL_ID) {
     // Escape all tags first
     let post = createPost(ctx.editedChannelPost);
 
@@ -103,7 +127,7 @@ bot.on('forward', (ctx) => {
   let msg = ctx.message;
 
   // Check if message forwarded from chat
-  if (msg.forward_from_chat && msg.forward_from_chat.id == process.env.GROUP_ID) {
+  if (msg.forward_from_chat && msg.forward_from_chat.id == process.env.CHANNEL_ID) {
     database.query(`DELETE FROM messages WHERE message = ?`, [msg.forward_from_message_id], (err) => {
       if (err) {
         console.error(err.message);
