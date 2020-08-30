@@ -1,6 +1,4 @@
-# cents-bot
-
-Simple synchronization Telegram channel with website page
+Simple script to sync Telegram channel content with [website page](https://knife.media/cents).
 
 ## Installation
 
